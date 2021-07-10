@@ -1,0 +1,13 @@
+**/.ipynb_checkpoints
+*.csv
+*.xlsx
+*.pdf
+*.png
+*.drawio
+*.pptx
+*.zip
+*.txt
+*.DS_Store
+*.names
+*.gif
+*.jpg
