@@ -1,4 +1,5 @@
 **/.ipynb_checkpoints
+**/__pycache__/
 *.csv
 *.xlsx
 *.pdf
@@ -12,3 +13,4 @@
 *.gif
 *.jpg
 *.gz
+*.code-workspace
