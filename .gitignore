@@ -14,3 +14,5 @@
 *.jpg
 *.gz
 *.code-workspace
+*.w2v
+*.json
