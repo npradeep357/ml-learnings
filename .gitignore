@@ -16,3 +16,4 @@
 *.code-workspace
 *.w2v
 *.json
+*.pkl
