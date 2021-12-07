@@ -23,7 +23,16 @@ class TicTacToe():
         """Takes state as an input and returns whether any row, column or diagonal has winning sum
         Example: Input state- [1, 2, 3, 4, nan, nan, nan, nan, nan]
         Output = False"""
- 
+        # creating all patterns for checks
+        # asusming the game will have only 9 places since it's a 3x3 board. and so the patterns:
+        patterns = [(0,1,2),(3,4,5),(6,7,8),(0,3,6),(1,4,7),(2,5,8),(0,4,8),(2,4,6)]
+        for pattern in patterns:
+            pattern_state = [curr_state[pattern[0]], curr_state[pattern[1]], curr_state[pattern[2]]]
+            # checking if the states in pattern are nan or their sum equals 15
+            if (True not in np.isnan(pattern_state)) and sum(pattern_state) == 15:
+                return True
+        return False
+
 
     def is_terminal(self, curr_state):
         # Terminal state could be winning state or when the board is filled up
@@ -31,7 +40,7 @@ class TicTacToe():
         if self.is_winning(curr_state) == True:
             return True, 'Win'
 
-        elif len(self.allowed_positions(curr_state)) ==0:
+        elif len(self.allowed_positions(curr_state)) == 0:
             return True, 'Tie'
 
         else:
@@ -47,8 +56,10 @@ class TicTacToe():
         """Takes the current state as input and returns all possible (unused) values that can be placed on the board"""
 
         used_values = [val for val in curr_state if not np.isnan(val)]
-        agent_values = [val for val in self.all_possible_numbers if val not in used_values and val % 2 !=0]
-        env_values = [val for val in self.all_possible_numbers if val not in used_values and val % 2 ==0]
+        # agent takes odd numbers
+        agent_values = [val for val in self.all_possible_numbers if val not in used_values and val % 2 != 0]
+        # env takes even numbers
+        env_values = [val for val in self.all_possible_numbers if val not in used_values and val % 2 == 0]
 
         return (agent_values, env_values)
 
@@ -67,6 +78,8 @@ class TicTacToe():
         Example: Input state- [1, 2, 3, 4, nan, nan, nan, nan, nan], action- [7, 9] or [position, value]
         Output = [1, 2, 3, 4, nan, nan, nan, 9, nan]
         """
+        curr_state[curr_action[0]] = curr_action[1]
+        return curr_state
 
 
     def step(self, curr_state, curr_action):
@@ -74,6 +87,35 @@ class TicTacToe():
         agent's move, whether the game is won/loss/tied. Then incorporate environment's move and again check the board status.
         Example: Input state- [1, 2, 3, 4, nan, nan, nan, nan, nan], action- [7, 9] or [position, value]
         Output = ([1, 2, 3, 4, nan, nan, nan, 9, nan], -1, False)"""
+        
+        terminated = False
+        move = self.state_transition(curr_state, curr_action)
+        terminated, game_status = self.is_terminal(move)
+        if terminated == True:
+            # this is the terminal state, checking if agent won
+            if game_status == 'Win':
+                # game won by agent, so reward will be +10
+                reward=10
+            else:
+                reward=0
+        else:
+            # generating env's move
+            pos = random.choice(self.allowed_positions(move))
+            val = random.choice(self.allowed_values(move)[1])
+            move[pos]= val
+            # making the move and checking if the game is terminated
+            terminated, game_status = self.is_terminal(move)
+            if terminated == True:
+                # terminal state
+                if game_status == 'Win':
+                    # game won by ENV, so reward will be -10
+                    reward=-10
+                else:
+                    reward=0
+            else:
+                # game not yet terminated. so reward will be -1
+                reward=-1
+        return move, reward, terminated
 
 
     def reset(self):
